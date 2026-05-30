@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>StableRandom</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app" v-cloak>
+  <div class="app">
+
+    
+    <div v-if="!user" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:80vh;text-align:center;padding:20px">
+      <div style="font-size:64px;margin-bottom:24px">🔒</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:12px;font-family:'Unbounded',sans-serif">Откройте через бота</div>
+      <div style="font-size:14px;color:#60608A;line-height:1.6">
+        Это приложение работает только через Telegram-бота.<br>
+        Нажмите кнопку ниже, откройте бота и нажмите «Открыть бота» внизу чата.<br>
+        <a :href="'https://t.me/' + botUsername" style="color:#6C5CE7;text-decoration:none;font-weight:600;display:inline-block;margin-top:12px">Открыть бота в Telegram</a>
+      </div>
+    </div>
+
+    
+    <div v-if="user && !isSubPage" style="position:sticky;top:0;z-index:100;padding:20px 0 0;margin-bottom:4px;background:linear-gradient(to bottom,#06060f 80%,transparent)">
+      
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div class="logo" style="font-size:20px;text-align:left">Stable<span class="logo-accent">Random</span></div>
+        <div v-if="user" style="display:flex;align-items:center;gap:8px;background:#18182A;border:1px solid #2C2C42;border-radius:99px;padding:5px 10px 5px 5px;cursor:pointer">
+          <div style="width:28px;height:28px;border-radius:14px;background:linear-gradient(135deg,#6C5CE7,#A78BFA);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">{{ userInitial }}</div>
+          <span style="font-size:13px;font-weight:500;color:#D0D0E8">{{ userName }}</span>
+        </div>
+      </div>
+      
+      <div style="display:flex;background:#13131C;border:1px solid #1E1E2C;border-radius:14px;padding:4px;gap:2px;margin-bottom:14px">
+        <button v-for="t in [{id:'home',label:'Созданные',icon:'🎁'},{id:'my',label:'Участвую',icon:'🎰'}]"
+          :key="t.id" @click="go(t.id)"
+          :style="{
+            flex:1, background: view===t.id ? '#6C5CE7' : 'none',
+            border:'none', borderRadius:'10px',
+            padding:'8px 4px',
+            color: view===t.id ? '#fff' : '#6060A0',
+            fontSize:'12px', fontWeight: view===t.id ? 600 : 400,
+            cursor:'pointer', fontFamily:'inherit',
+            display:'flex', alignItems:'center', justifyContent:'center', gap:'4px',
+            transition:'all .2s', whiteSpace:'nowrap',
+          }">
+          <span style="font-size:14px">{{ t.icon }}</span>
+          <span>{{ t.label }}</span>
+        </button>
+      </div>
+    </div>
+
+    
+    <div v-if="user" style="padding-top:12px">
+      <home-page     ref="homePage"     v-show="view === 'home'"     @open="openGiveaway" @analytics="openAnalytics" @create="navigate('create')"></home-page>
+      <my-page       ref="myPage"       v-show="view === 'my'"       @open="openGiveaway"></my-page>
+    </div>
+    <create-page   v-if="user && view === 'create'"   @back="goBack" @created="onCreated"></create-page>
+    <detail-page   v-if="user && view === 'detail'"   ref="detail"
+      :giveaway-id="detailId"
+      @back="goBack"
+      @draw="onDraw"
+      @analytics="openAnalytics"
+      @open-date-picker="openDatePicker"
+    ></detail-page>
+    <analytics-page v-if="user && view === 'analytics'"
+      :giveaway-id="analyticsId"
+      @back="goBack"
+      @broadcast="openBroadcast"
+    ></analytics-page>
+  </div>
+
+  
+  <template v-if="user">
+    <date-picker ref="datePicker" @select="onDateSelected"></date-picker>
+    <winner-reveal ref="reveal" @close="onRevealClose"></winner-reveal>
+
+    
+    <div class="dp-overlay" v-if="showBroadcast" @click.self="closeBroadcast">
+      <div class="dp-box">
+        <div style="text-align:center;font-family:'Unbounded',sans-serif;font-size:14px;font-weight:700;color:var(--blue);margin-bottom:16px">
+          📢 Сообщение участникам
+        </div>
+        <textarea class="ft" v-model="broadcastMsg" placeholder="Напишите сообщение..."
+          maxlength="1000" style="margin-bottom:12px;min-height:120px"></textarea>
+        <div class="dp-actions">
+          <button class="btn btn-g" @click="closeBroadcast">Отмена</button>
+          <button class="btn btn-p" @click="sendBroadcast">Отправить</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  
+  <div class="toast" :class="[toastVisible ? 'show' : '', toastType === 'err' ? 'toast-err' : 'toast-ok']">
+    {{ toastMsg }}
+  </div>
+</div>
+
+<script type="module" src="js/main.js?v=40"></script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+/* ===== ОСНОВНЫЕ ПЕРЕМЕННЫЕ ===== */
+:root {
+  --bg: #06060f;
+  --card: rgba(15,15,35,0.7);
+  --glass: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.06);
+  --blue: #00d4ff;
+  --purple: #a855f7;
+  --pink: #ff2d8a;
+  --green: #00ff88;
+  --orange: #ff8800;
+  --text: #f0f0ff;
+  --dim: rgba(240,240,255,0.55);
+  --muted: rgba(240,240,255,0.3);
+  --r: 20px;
+  --rs: 14px;
+  --rx: 10px;
+}
+
+/* ===== СБРОС ===== */
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none }
+::-webkit-scrollbar { display:none }
+html { scrollbar-width:none; -ms-overflow-style:none }
+body {
+  font-family: 'Manrope', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+[v-cloak] { display: none !important; }
+
+/* ===== ФОН — без эффектов ===== */
+.bg-mesh { display:none }
+.grid-ov { display:none }
+.particles { display:none }
+.particle { display:none }
+
+/* ===== КОНТЕЙНЕР ПРИЛОЖЕНИЯ ===== */
+.app { position:relative; z-index:1; max-width:480px; margin:0 auto; padding:0 16px 40px }
+
+/* ===== ШАПКА ===== */
+.header { padding:20px 0 16px; text-align:center }
+.logo {
+  font-family: 'Unbounded', sans-serif; font-size:26px; font-weight:800;
+  color: #fff; letter-spacing: -.5px;
+}
+.logo-accent {
+  background: linear-gradient(135deg, var(--blue), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.uchip {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--glass); border:1px solid var(--border); border-radius:50px;
+  padding:6px 16px 6px 6px; margin-top:12px; backdrop-filter:blur(20px);
+}
+.uav {
+  width:28px; height:28px; border-radius:50%;
+  background:linear-gradient(135deg, var(--blue), var(--purple));
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:700;
+}
+.uname { font-size:13px; font-weight:600 }
+
+/* ===== ТАБЫ ===== */
+.tabs {
+  display:flex; background:var(--glass); border:1px solid var(--border);
+  border-radius:16px; padding:4px; margin:20px 0; backdrop-filter:blur(20px);
+}
+.tab {
+  flex:1; padding:12px 6px; text-align:center; font-size:12px; font-weight:600;
+  color:var(--dim); border-radius:13px; cursor:pointer; transition:.3s; user-select:none;
+}
+.tab.active { color:var(--bg); background:var(--blue); box-shadow:0 0 30px rgba(0,212,255,.3) }
+
+/* ===== ПАНЕЛИ (анимация появления) ===== */
+.panel { animation: fs .4s ease; min-height: 60vh }
+@keyframes fs { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+
+/* ===== КНОПКА-ГЕРОЙ (градиентная) ===== */
+.hero-btn {
+  position:relative; width:100%; padding:22px; border:none; border-radius:var(--r);
+  cursor:pointer; overflow:hidden; margin-bottom:16px;
+  background:linear-gradient(135deg, #0044ff, #7c3aed, #ff2d8a);
+  background-size:200% 200%; animation: gm 4s ease infinite; transition:transform .2s;
+}
+.hero-btn:active { transform:scale(.97) }
+@keyframes gm { 0% { background-position:0% 50% } 50% { background-position:100% 50% } 100% { background-position:0% 50% } }
+.hero-inner { position:relative; z-index:2; display:flex; align-items:center; justify-content:center; gap:12px }
+.hero-icon { font-size:28px; animation: pls 2s ease-in-out infinite }
+@keyframes pls { 0%,100% { transform:scale(1) } 50% { transform:scale(1.15) } }
+.hero-text { font-family:'Unbounded',sans-serif; font-size:17px; font-weight:700; color:#fff }
+.hero-shim {
+  position:absolute; inset:0;
+  background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,.15) 50%, transparent 60%);
+  background-size:200% 100%; animation: shim 3s ease infinite;
+}
+@keyframes shim { 0% { background-position:200% 0 } 100% { background-position:-200% 0 } }
+
+/* ===== КАРТОЧКИ ===== */
+.card {
+  background:var(--card); border:1px solid var(--border); border-radius:var(--r);
+  padding:20px; margin-bottom:14px; backdrop-filter:blur(20px);
+  transition:.3s; position:relative; overflow:hidden;
+}
+.card:active { transform:scale(.98) }
+.card-h { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px }
+.card-t { font-family:'Unbounded',sans-serif; font-size:16px; font-weight:700; line-height:1.3 }
+.card-desc { font-size:14px; color:var(--dim); line-height:1.5; margin-bottom:16px }
+
+/* ===== БЕЙДЖИ СТАТУСА ===== */
+.badge { padding:4px 12px; border-radius:50px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px; flex-shrink:0 }
+.b-active { background:rgba(0,255,136,.12); color:var(--green); border:1px solid rgba(0,255,136,.2) }
+.b-done { background:rgba(255,45,138,.12); color:var(--pink); border:1px solid rgba(255,45,138,.2) }
+.b-draft { background:rgba(255,230,0,.12); color:#ffe600; border:1px solid rgba(255,230,0,.2) }
+
+/* ===== СТАТИСТИКА ===== */
+.stats { display:flex; gap:16px }
+.stat { display:flex; align-items:center; gap:6px }
+.stat-v { font-size:14px; font-weight:700 }
+.stat-l { font-size:12px; color:var(--muted) }
+
+/* ===== КНОПКИ ===== */
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:14px 24px; border:none; border-radius:var(--rs);
+  font-family:'Manrope',sans-serif; font-size:14px; font-weight:700;
+  cursor:pointer; transition:.3s; user-select:none;
+}
+.btn:active { transform:scale(.96) }
+.btn-p { background:var(--blue); color:var(--bg); box-shadow:0 0 30px rgba(0,212,255,.3) }
+.btn-d { background:rgba(255,45,138,.15); color:var(--pink); border:1px solid rgba(255,45,138,.3) }
+.btn-g { background:var(--glass); color:var(--text); border:1px solid var(--border) }
+.btn-s { background:var(--green); color:var(--bg); box-shadow:0 0 30px rgba(0,255,136,.3) }
+.btn-full { width:100% }
+
+/* ===== ФОРМЫ ===== */
+.fg { margin-bottom:18px }
+.fl { display:block; font-size:12px; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:8px }
+.fi, .ft {
+  width:100%; padding:16px 18px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:var(--rs);
+  color:var(--text); font-family:'Manrope',sans-serif; font-size:15px; font-weight:500;
+  outline:none; transition:.3s;
+}
+.fi:focus, .ft:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(0,212,255,.1) }
+.fi::placeholder, .ft::placeholder { color:var(--muted) }
+.ft { resize:vertical; min-height:80px }
+/* ===== РАЗРЕШИТЬ ВЫДЕЛЕНИЕ ТЕКСТА ===== */
+.card-t,
+.card-desc,
+.d-hero-t,
+.d-hero-d,
+.empty-t,
+.empty-s,
+.part-n,
+.ch-title,
+.ch-meta,
+.sub-ch-name,
+.reveal-wn,
+.success-title,
+.success-subtitle,
+.success-card-t,
+.success-card-s,
+.fi,
+.ft {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* ===== ПУСТЫЕ СОСТОЯНИЯ ===== */
+.empty { text-align:center; padding:50px 20px }
+.empty-i { font-size:64px; margin-bottom:16px; opacity:.6; animation: flt 3s ease-in-out infinite }
+@keyframes flt { 0%,100% { transform:translateY(0) } 50% { transform:translateY(-10px) } }
+.empty-t { font-family:'Unbounded',sans-serif; font-size:18px; font-weight:700; margin-bottom:8px }
+.empty-s { font-size:14px; color:var(--dim); line-height:1.6 }
+
+/* ===== СЕКЦИИ ===== */
+.sec-h { display:flex; align-items:center; justify-content:space-between; margin:28px 0 14px }
+.sec-t { font-family:'Unbounded',sans-serif; font-size:14px; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:2px }
+.sec-c { font-size:12px; color:var(--muted); background:var(--glass); padding:4px 10px; border-radius:50px; border:1px solid var(--border) }
+
+/* ===== УЧАСТНИКИ ===== */
+.part {
+  display:flex; align-items:center; gap:12px; padding:14px 16px;
+  background:var(--glass); border:1px solid var(--border); border-radius:var(--rs); margin-bottom:8px;
+}
+.part-av {
+  width:36px; height:36px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:700; flex-shrink:0;
+}
+.part-n { font-size:14px; font-weight:600 }
+.part.win { border-color:rgba(0,255,136,.3); background:rgba(0,255,136,.05) }
+.part.win .part-n { color:var(--green) }
+
+/* ===== НАВИГАЦИЯ "НАЗАД" ===== */
+.back { display:inline-flex; align-items:center; gap:6px; font-size:14px; color:var(--blue); font-weight:600; cursor:pointer; padding:10px 0 }
+.back:active { opacity:.6 }
+
+/* ===== ДЕТАЛЬНАЯ СТРАНИЦА — ГЕРОЙ ===== */
+.d-hero { text-align:center; padding:30px 0 20px }
+.d-hero-i { font-size:56px; margin-bottom:16px; display:inline-block; animation: flt 3s ease-in-out infinite }
+.d-hero-t { font-family:'Unbounded',sans-serif; font-size:22px; font-weight:800; line-height:1.3; margin-bottom:8px }
+.d-hero-d { font-size:14px; color:var(--dim); line-height:1.5 }
+
+/* ===== КАНАЛЫ ===== */
+.ch-item {
+  display:flex; align-items:center; gap:12px; padding:14px 16px;
+  background:var(--glass); border:1px solid var(--border); border-radius:var(--rs);
+  margin-bottom:8px; transition:.3s;
+}
+.ch-item.selected { border-color:rgba(0,212,255,.4); background:rgba(0,212,255,.06) }
+.ch-av {
+  width:40px; height:40px; border-radius:12px;
+  background:linear-gradient(135deg, var(--blue), var(--purple));
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.ch-info { flex:1; min-width:0 }
+.ch-title { font-size:14px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.ch-meta { font-size:12px; color:var(--muted); margin-top:2px }
+.ch-check {
+  width:24px; height:24px; border-radius:50%; border:2px solid var(--border);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:.3s; font-size:14px;
+}
+.ch-item.selected .ch-check { border-color:var(--blue); background:var(--blue); color:var(--bg) }
+.ch-rm {
+  width:32px; height:32px; border-radius:50%;
+  border:1px solid rgba(255,45,138,.3); background:rgba(255,45,138,.08);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:14px; flex-shrink:0;
+}
+
+/* ===== ПОДПИСКА НА КАНАЛЫ ===== */
+.sub-card { background:rgba(255,136,0,.06); border:1px solid rgba(255,136,0,.15); border-radius:var(--r); padding:20px; margin-bottom:14px }
+.sub-title { font-family:'Unbounded',sans-serif; font-size:14px; font-weight:700; color:var(--orange); margin-bottom:14px; text-align:center }
+.sub-ch { display:flex; align-items:center; gap:10px; padding:12px; background:rgba(255,255,255,.03); border-radius:var(--rx); margin-bottom:8px; cursor:pointer }
+.sub-ch-name { font-size:14px; font-weight:600; flex:1 }
+.sub-ch-status { font-size:11px; font-weight:700; padding:3px 10px; border-radius:50px }
+.sub-ch-ok { background:rgba(0,255,136,.12); color:var(--green) }
+.sub-ch-no { background:rgba(255,45,138,.12); color:var(--pink) }
+
+/* ===== TOAST (уведомление) ===== */
+.toast {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-100px);
+  background:#0f0f23; border:1px solid var(--border); border-radius:var(--rs);
+  padding:14px 24px; font-size:14px; font-weight:600; z-index:2000;
+  transition: transform .4s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 10px 40px rgba(0,0,0,.5);
+}
+.toast.show { transform:translateX(-50%) translateY(0) }
+.toast-ok { border-color:rgba(0,255,136,.3) }
+.toast-err { border-color:rgba(255,45,138,.3) }
+
+/* ===== АНИМАЦИЯ ПОБЕДИТЕЛЯ ===== */
+.reveal {
+  position:fixed; inset:0; z-index:1000;
+  background:rgba(6,6,15,.95); display:flex; align-items:center; justify-content:center;
+  backdrop-filter:blur(20px); animation: fi .3s ease;
+}
+@keyframes fi { from { opacity:0 } to { opacity:1 } }
+.reveal-c { text-align:center; padding:40px 30px; position:relative }
+.reveal-t { font-family:'Unbounded',sans-serif; font-size:14px; font-weight:600; color:var(--dim); text-transform:uppercase; letter-spacing:3px; margin-bottom:24px }
+.reveal-sp {
+  width:120px; height:120px; margin:0 auto 30px; border-radius:50%;
+  border:3px solid var(--border); border-top-color:var(--blue); border-right-color:var(--purple);
+  animation: sr .8s linear infinite;
+  display:flex; align-items:center; justify-content:center;
+}
+.reveal-sp.done { animation:none; border-color:var(--green); box-shadow:0 0 40px rgba(0,255,136,.3) }
+@keyframes sr { to { transform:rotate(360deg) } }
+.reveal-sp-t { font-size:40px }
+.reveal-wn {
+  font-family:'Unbounded',sans-serif; font-size:28px; font-weight:800;
+  background:linear-gradient(135deg, var(--green), var(--blue));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  opacity:0; transform:scale(.5); transition:all .5s cubic-bezier(.34,1.56,.64,1);
+}
+.reveal-wn.show { opacity:1; transform:scale(1) }
+.reveal-cf { position:absolute; inset:0; pointer-events:none; overflow:hidden }
+.cf-p { position:absolute; top:50%; left:50%; animation: cfb 1s ease-out forwards; opacity:0 }
+@keyframes cfb {
+  0%   { opacity:1; transform:translate(0,0) rotate(0) scale(1) }
+  100% { opacity:0; transform:translate(var(--tx), var(--ty)) rotate(720deg) scale(0) }
+}
+
+/* ===== ШАРИНГ ===== */
+.share-box {
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:rgba(0,212,255,.06); border:1px dashed rgba(0,212,255,.2);
+  border-radius:var(--rx); margin-top:12px; cursor:pointer; transition:.3s;
+}
+.share-box:active { background:rgba(0,212,255,.1) }
+.share-t { font-size:13px; color:var(--blue); font-weight:600 }
+.share-h { font-size:11px; color:var(--muted); margin-left:auto }
+
+/* ===== DATE PICKER ===== */
+.dp-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(6,6,15,.85); display:flex; align-items:flex-end; justify-content:center;
+  backdrop-filter:blur(10px);
+}
+.dp-box {
+  background:#0f0f23; border:1px solid var(--border); border-radius:20px 20px 0 0;
+  width:100%; max-width:480px; padding:24px 20px; padding-bottom:max(24px, env(safe-area-inset-bottom));
+}
+.dp-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px }
+.dp-month { font-family:'Unbounded',sans-serif; font-size:16px; font-weight:700 }
+.dp-arrow {
+  width:36px; height:36px; border-radius:50%;
+  background:var(--glass); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; color:var(--text);
+}
+.dp-weekdays { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; margin-bottom:8px }
+.dp-wd { font-size:12px; font-weight:700; color:var(--muted); padding:8px 0 }
+.dp-days { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; text-align:center }
+.dp-day { padding:10px 0; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; color:var(--text); transition:.2s }
+.dp-day:active { transform:scale(.9) }
+.dp-day.other { color:var(--muted); opacity:.4 }
+.dp-day.today { border:1px solid var(--blue) }
+.dp-day.selected { background:var(--blue); color:var(--bg) }
+.dp-day.past { color:var(--muted); opacity:.3; pointer-events:none }
+.dp-time { display:flex; align-items:center; justify-content:center; gap:8px; margin:16px 0 }
+.dp-time-input {
+  width:70px; padding:12px; text-align:center;
+  background:var(--glass); border:1px solid var(--border); border-radius:12px;
+  color:var(--text); font-family:'Unbounded',sans-serif; font-size:20px; font-weight:700; outline:none;
+}
+.dp-time-input:focus { border-color:var(--blue) }
+.dp-time-input::-webkit-outer-spin-button,
+.dp-time-input::-webkit-inner-spin-button { -webkit-appearance:none; margin:0 }
+.dp-time-input { -moz-appearance:textfield }
+.dp-time-sep { font-size:24px; font-weight:700; color:var(--muted) }
+.dp-actions { display:flex; gap:10px; margin-top:12px }
+.dp-actions .btn { flex:1 }
+
+/* ===== ПРЕВЬЮ ПОСТА ===== */
+.preview-box { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:16px; margin-bottom:14px }
+.preview-img { width:100%; border-radius:var(--rx); margin-bottom:12px; max-height:200px; object-fit:cover }
+
+/* ===== ЗАГРУЗКА ФОТО ===== */
+.photo-upload {
+  width:100%; padding:40px 20px; border:2px dashed var(--border);
+  border-radius:var(--rs); text-align:center; cursor:pointer; transition:.3s;
+}
+.photo-upload:active { border-color:var(--blue) }
+.photo-upload img { max-width:100%; max-height:200px; border-radius:var(--rx); margin-bottom:8px }
+
+/* ===== SUCCESS MODAL (Design from Contest Analytics) ===== */
+.success-overlay {
+  position:fixed; inset:0; z-index:1000;
+  background:#0D0D12; display:flex; align-items:center; justify-content:center;
+  animation: fi .3s ease; padding: 20px;
+}
+.success-content {
+  text-align:center; width:100%; max-width:350px;
+}
+.success-icon-wrap {
+  position:relative; width:100px; height:100px; margin:0 auto 24px;
+  display:flex; align-items:center; justify-content:center;
+}
+.success-icon {
+  font-size:64px; z-index:2; animation: pls 2s ease-in-out infinite;
+}
+.success-glow {
+  position:absolute; inset:0; border-radius:50%;
+  background: radial-gradient(circle, var(--blue) 0%, transparent 70%);
+  opacity:0.3; filter:blur(10px); animation: pls 2s ease-in-out infinite reverse;
+}
+.success-title {
+  font-family:'Unbounded',sans-serif; font-size:28px; font-weight:800;
+  color:#fff; margin-bottom:8px;
+}
+.success-subtitle {
+  font-size:15px; color:var(--dim); line-height:1.5; margin-bottom:32px;
+}
+.success-cards {
+  display:flex; flex-direction:column; gap:12px; margin-bottom:20px;
+}
+.success-card {
+  display:flex; align-items:center; gap:16px; padding:16px;
+  background:#13131A; border:1px solid var(--border); border-radius:18px;
+  cursor:pointer; transition:.3s; text-align:left;
+}
+.success-card:active { transform:scale(.97); background:#1A1A24; }
+.success-card-icon {
+  width:44px; height:44px; border-radius:12px;
+  background:rgba(255,255,255,.05);
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.success-card-info { flex:1; min-width:0; }
+.success-card-t { font-size:14px; font-weight:700; color:#fff; margin-bottom:2px; }
+.success-card-s { font-size:12px; color:var(--muted); }
+.success-card-arrow { font-size:16px; color:var(--muted); }

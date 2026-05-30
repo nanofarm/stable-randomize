@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#06060f;color:#F0F0F8;font-family:system-ui,sans-serif;font-size:13px}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+h1,h2{font-size:18px;margin-bottom:16px}
+.login-box{max-width:360px;margin:80px auto;background:#13131C;border:1px solid #1E1E2C;border-radius:16px;padding:28px}
+.field{margin-bottom:14px}.field label{display:block;font-size:12px;color:#8080A0;margin-bottom:6px}
+.field input{width:100%;background:#0D0D12;border:1px solid #2A2A3C;border-radius:10px;padding:10px 12px;color:#F0F0F8;font-size:13px}
+.btn{background:linear-gradient(135deg,#6C5CE7,#9580FF);border:none;border-radius:12px;padding:12px;color:#fff;font-weight:700;font-size:14px;cursor:pointer}
+.btn-sm{padding:6px 12px;font-size:12px}.btn-ghost{background:transparent;border:1px solid #2A2A3C;color:#8080A0}
+.btn-red{background:#F8717130;border:1px solid #F8717160;color:#F87171}
+.toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.toolbar input{background:#0D0D12;border:1px solid #2A2A3C;border-radius:10px;padding:8px 12px;color:#F0F0F8;min-width:220px;font-size:13px}
+.table-wrap{background:#13131C;border:1px solid #1E1E2C;border-radius:14px;overflow:auto;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{padding:10px 12px;text-align:left;white-space:nowrap}
+th{background:#0D0D12;color:#8080A0;font-size:11px;text-transform:uppercase;position:sticky;top:0}
+tr:not(:last-child) td{border-bottom:1px solid #1A1A24}tr:hover td{background:#1A1A2480}
+.badge{padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600}.badge-active{background:#0D2A1E;color:#34D399}
+.badge-finished{background:#1E1E2A;color:#8080A0}.badge-draft{background:#2A2010;color:#F5A623}
+.pagination{display:flex;gap:8px;justify-content:flex-end;padding:12px}
+.pagination button{background:#1A1A24;border:1px solid #2A2A3C;color:#D0D0E8;border-radius:8px;padding:6px 12px;cursor:pointer}
+.pagination button:disabled{opacity:.4;cursor:default}
+.toast{position:fixed;bottom:20px;right:20px;padding:12px 18px;border-radius:12px;font-weight:600;z-index:100;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}.toast-ok{background:#0D2A1E;color:#34D399;border:1px solid #1A4A30}
+.toast-err{background:#2A1010;color:#F87171;border:1px solid #4A2020}
+.hidden{display:none!important}.cursor{cursor:pointer}
+.edit-input{background:#0D0D12;border:1px solid #6C5CE7;border-radius:6px;padding:4px 8px;color:#F0F0F8;font-size:12px;width:90px}
+.cell-changed{background:#1A1030!important}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div id="login" class="login-box">
+  <h1 style="text-align:center;margin-bottom:20px">🔒 Admin Panel</h1>
+  <div class="field"><label>Логин</label><input type="text" id="in-login" placeholder="admin"></div>
+  <div class="field"><label>Пароль</label><input type="password" id="in-pass" placeholder="password"></div>
+  <button class="btn" onclick="doLogin()" style="width:100%">Войти</button>
+</div>
+
+<div id="dash" class="hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <h1>📋 Конкурсы</h1>
+    <button class="btn btn-sm btn-ghost" onclick="logout()">Выйти</button>
+  </div>
+  <div class="toolbar">
+    <input type="text" id="g-search" placeholder="Поиск по названию..." oninput="filterG()">
+    <button class="btn btn-sm" onclick="loadG(1)">Обновить</button>
+  </div>
+  <div class="table-wrap">
+    <table id="g-table"><thead><tr><th>ID</th><th>Название</th><th>Статус</th><th>Каналы</th><th>Участники</th><th>Создан</th><th></th></tr></thead><tbody></tbody></table>
+  </div>
+  <div class="pagination" id="g-pag"></div>
+</div>
+
+<div id="part" class="hidden">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <button class="btn btn-sm btn-ghost" onclick="showDash()">← Назад</button>
+    <div style="text-align:right"><div id="p-id" style="font-size:11px;color:#8080A0">ID: –</div><h2 id="p-title" style="margin:0">Участники</h2></div>
+  </div>
+  <div class="toolbar">
+    <input type="text" id="p-search" placeholder="Поиск..." oninput="filterP()">
+    <button class="btn btn-sm" onclick="loadP(pGid,1)">Обновить</button>
+    <button class="btn btn-sm" onclick="saveAll()">💾 Сохранить всё</button>
+    <button class="btn btn-sm btn-red" onclick="delSelected()">Удалить выбранные</button>
+  </div>
+  <div class="table-wrap">
+    <table id="p-table">
+      <thead><tr><th><input type="checkbox" onchange="toggleAll(this)"></th><th>ID</th><th>user_id</th><th>Имя</th><th>username</th><th>Билеты</th><th>Победитель</th><th>Место</th><th>Source</th><th>Дата</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="pagination" id="p-pag"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+</div>
+
+<script>
+const API=location.origin+'/api/admin';
+let creds='',gList=[],gPage=1,gTotal=0,pList=[],pPage=1,pTotal=0,pGid='',selIds=new Set(),editMap=new Map();
+
+function h(){return{Authorization:'Basic '+btoa(unescape(encodeURIComponent(creds))),'Content-Type':'application/json'}}
+async function j(url,opts={}){const r=await fetch(url,{...opts,headers:{...h(),...(opts.headers||{})}});return r.json().catch(()=>({ok:false}))}
+function toast(t,ok){const el=document.getElementById('toast');el.textContent=t;el.className='toast show '+(ok?'toast-ok':'toast-err');setTimeout(()=>el.className='toast',2500)}
+function fmtDate(s){if(!s)return '-';const d=new Date(s);return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function stClass(s){return s==='active'?'badge-active':s==='finished'?'badge-finished':'badge-draft'}
+
+async function doLogin(){
+  const l=document.getElementById('in-login').value,p=document.getElementById('in-pass').value;
+  if(!l||!p)return toast('Введите логин и пароль',0);
+  creds=l+':'+p;
+  const r=await j(API+'/login',{method:'POST'});
+  if(r.ok){document.getElementById('login').classList.add('hidden');document.getElementById('dash').classList.remove('hidden');loadG(1);}
+  else toast('Неверный логин или пароль',0);
+}
+function logout(){creds='';['login','dash','part'].forEach(id=>document.getElementById(id).classList.toggle('hidden',id!=='login'));}
+function showDash(){document.getElementById('part').classList.add('hidden');document.getElementById('dash').classList.remove('hidden');}
+
+async function loadG(page){
+  gPage=page;
+  const r=await j(API+'/giveaways?page='+page);
+  console.log('giveaways resp',r);
+  if(!r.ok){gErr=r.error||'Ошибка загрузки конкурсов';toast(gErr,0);gList=[];renderG();return;}
+  gErr='';gList=r.data||[];gTotal=r.total||0;
+  renderG();renderPag('g-pag',gPage,r.pages||1,loadG);
+}
+let gErr='';
+function renderG(){
+  const term=document.getElementById('g-search').value.toLowerCase();
+  if(gErr){document.querySelector('#g-table tbody').innerHTML=`<tr><td colspan="7" style="text-align:center;color:#F87171;padding:20px">${esc(gErr)}</td></tr>`;return;}
+  const rows=gList.filter(g=>!term||String(g.title||'').toLowerCase().includes(term)).map(g=>{
+    const t=esc(g.title||'(без названия)'),pid=esc(g.public_id||g.id||'?');
+    const chs=(g.channels||[]).map(c=>{
+      const link=c.username?`https://t.me/${c.username}`:(c.invite_link||'#')
+      const label=c.username?`@${c.username}`:(c.title||'канал')
+      return `<a href="${esc(link)}" target="_blank" style="color:#6C5CE7;text-decoration:underline;font-size:11px">${esc(label)}</a>`
+    }).join(', ')||'-'
+    return `<tr>
+    <td><div style="font-weight:700;font-size:13px">${g.id??'?'}</div><div style="font-size:11px;color:#8080A0">${pid}</div></td><td>${t}</td>
+    <td><span class="badge ${stClass(g.status)}">${g.status||'-'}</span></td>
+    <td>${chs}</td>
+    <td>${g.participant_count??0}</td><td>${fmtDate(g.created_at)}</td>
+    <td><button class="btn btn-sm" onclick="openP('${pid}','${t.replace(/'/g,"&#39;")}')">Участники</button></td>
+  </tr>`;
+  }).join('');
+  document.querySelector('#g-table tbody').innerHTML=rows||'<tr><td colspan="7" style="text-align:center;color:#50507A;padding:20px">Нет данных</td></tr>';
+}
+function filterG(){renderG();}
+
+async function openP(gid,title){
+  pGid=gid;document.getElementById('p-id').textContent='ID: '+gid;document.getElementById('p-title').textContent='Участники: '+title;
+  document.getElementById('dash').classList.add('hidden');document.getElementById('part').classList.remove('hidden');
+  selIds.clear();editMap.clear();await loadP(gid,1);
+}
+async function loadP(gid,page){
+  pPage=page;
+  const r=await j(API+'/giveaway/'+gid+'/participants?page='+page);
+  console.log('participants resp',r);
+  if(!r.ok){pErr=r.error||'Ошибка загрузки участников';toast(pErr,0);pList=[];renderP();return;}
+  pErr='';pList=r.data||[];pTotal=r.total||0;
+  renderP();renderPag('p-pag',pPage,r.pages||1,pg=>loadP(gid,pg));
+}
+let pErr='';
+function renderP(){
+  const term=document.getElementById('p-search').value.toLowerCase();
+  if(pErr){document.querySelector('#p-table tbody').innerHTML=`<tr><td colspan="11" style="text-align:center;color:#F87171;padding:20px">${esc(pErr)}</td></tr>`;return;}
+  const rows=pList.filter(p=>!term||String(p.user_name).toLowerCase().includes(term)||String(p.user_id).includes(term)).map(p=>{
+    const edit=editMap.get(p.id);
+    return `<tr>
+      <td><input type="checkbox" ${selIds.has(p.id)?'checked':''} onchange="toggleSel(${p.id},this.checked)"></td>
+      <td><div style="font-weight:700;font-size:13px">${p.id}</div><div style="font-size:11px;color:#8080A0">#${p.user_id}</div></td>
+      <td>${editCell(p.id,'user_name',p.user_name)}</td>
+      <td>${editCell(p.id,'username',p.username)}</td>
+      <td>${editCell(p.id,'tickets',p.tickets)}</td>
+      <td>${editCell(p.id,'is_winner',p.is_winner?1:0)}</td>
+      <td>${editCell(p.id,'winner_place',p.winner_place||'')}</td>
+      <td>${esc(p.source||'-')}</td><td>${fmtDate(p.created_at)}</td>
+      <td><button class="btn btn-sm btn-red" onclick="delOne(${p.id})">🗑</button></td>
+    </tr>`;
+  }).join('');
+  document.querySelector('#p-table tbody').innerHTML=rows||'<tr><td colspan="11" style="text-align:center;color:#50507A;padding:20px">Нет данных</td></tr>';
+}
+function filterP(){renderP();}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+const editState={id:null,field:null,val:null};
+function startEdit(id,field,val){
+  editMap.set(id+'_'+field,String(val||''));
+  renderP();
+}
+function editCell(id,field,val){
+  const key=id+'_'+field;
+  const changed=editMap.has(key);
+  const cls=changed?'cell-changed':'';
+  if(changed){
+    const v=esc(editMap.get(key));
+    return `<input class="edit-input ${cls}" data-id="${id}" data-field="${field}" value="${v}" 
+      onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault()}else if(event.key==='Escape'){editMap.delete('${key}');renderP();event.preventDefault()}" 
+      onblur="saveEdit(this.dataset.id,this.dataset.field,this.value)" 
+      onclick="event.stopPropagation()" autofocus>`;
+  }
+  const display=(val!==null&&val!==''&&val!==undefined)?esc(val):'-'
+  return `<span class="cursor ${cls}" data-eid="${id}" data-efield="${field}" data-eval="${esc(val||'')}">${display}</span>`;
+}
+document.addEventListener('click',e=>{
+  const s=e.target.closest('[data-eid]');
+  if(!s)return;
+  startEdit(Number(s.dataset.eid),s.dataset.efield,s.dataset.eval);
+});
+async function saveEdit(id,field,val){
+  const key=id+'_'+field;
+  editMap.delete(key);
+  const payload={[field]:field==='is_winner'?Boolean(Number(val)):field==='tickets'||field==='winner_place'?Number(val)||null:val};
+  const r=await j(API+'/participant/'+id,{method:'PUT',body:JSON.stringify(payload)});
+  if(r.ok){toast('Сохранено',1);loadP(pGid,pPage);}
+  else{toast(r.error||'Ошибка сохранения',0);editMap.set(key,val);renderP();}
+}
+async function saveAll(){
+  const pending=[];
+  for(const [key,val] of editMap){
+    if(key==='_ids')continue;
+    const [id,field]=key.split('_');
+    if(!id||!field)continue;
+    pending.push({id:Number(id),field,val,key});
+  }
+  if(!pending.length)return toast('Нет изменений',0);
+  let ok=0,err=0;
+  for(const p of pending){
+    const payload={[p.field]:p.field==='is_winner'?Boolean(Number(p.val)):p.field==='tickets'||p.field==='winner_place'?Number(p.val)||null:p.val};
+    const r=await j(API+'/participant/'+p.id,{method:'PUT',body:JSON.stringify(payload)});
+    if(r.ok){editMap.delete(p.key);ok++;}
+    else{err++;}
+  }
+  toast(`Сохранено ${ok}, ошибок ${err}`,err?0:1);
+  loadP(pGid,pPage);
+}
+
+function toggleAll(ch){document.querySelectorAll('#p-table tbody input[type=checkbox]').forEach(c=>{c.checked=ch.checked;toggleSel(Number(c.closest('tr').querySelector('td:nth-child(2)').textContent),ch.checked);});}
+function toggleSel(id,on){on?selIds.add(id):selIds.delete(id);}
+async function delOne(id){if(!confirm('Удалить участника #'+id+'?'))return;await delIds([id]);}
+async function delSelected(){if(!selIds.size)return toast('Ничего не выбрано',0);if(!confirm('Удалить '+selIds.size+' участников?'))return;await delIds(Array.from(selIds));}
+async function delIds(ids){for(const id of ids){const r=await j(API+'/participant/'+id,{method:'DELETE'});if(!r.ok)toast('Ошибка удаления #'+id,0);}toast('Удалено',1);selIds.clear();loadP(pGid,pPage);}
+
+let _pagCallbacks={};
+function renderPag(elId,page,pages,cb){
+  _pagCallbacks[elId]=cb;
+  let h='';
+  h+=`<button ${page===1?'disabled':''} onclick="_pagCallbacks['${elId}'](${page-1})">←</button>`;
+  h+=`<span style="color:#8080A0;font-size:12px">${page} / ${pages}</span>`;
+  h+=`<button ${page===pages?'disabled':''} onclick="_pagCallbacks['${elId}'](${page+1})">→</button>`;
+  document.getElementById(elId).innerHTML=pages>1?h:'';
+}
+</script>
+</body>
+</html>

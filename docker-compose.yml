@@ -1,0 +1,194 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: randomize-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_DATABASE:-randomize}
+      MYSQL_USER: ${DB_USERNAME:-randomize}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - randomize
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: randomize-api
+    restart: unless-stopped
+    environment:
+      APP_NAME: Randomize
+      APP_ENV: production
+      APP_KEY: ${APP_KEY:-}
+      APP_DEBUG: "false"
+      APP_URL: ${APP_URL:-http://localhost}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-randomize}
+      DB_USERNAME: ${DB_USERNAME:-randomize}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      TELEGRAM_BOT_TOKEN: ${BOT_TOKEN}
+      TELEGRAM_MINI_APP_SHORT_NAME: ${TELEGRAM_MINI_APP_SHORT_NAME:-}
+      QUEUE_CONNECTION: database
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-secret}
+    volumes:
+      - ./api:/var/www
+      - ./webapp:/var/www/webapp
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - randomize
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  scheduler:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: randomize-scheduler
+    restart: unless-stopped
+    command: php artisan schedule:work
+    environment:
+      APP_NAME: Randomize
+      APP_ENV: production
+      APP_KEY: ${APP_KEY:-}
+      APP_DEBUG: "false"
+      APP_URL: ${APP_URL:-http://localhost}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-randomize}
+      DB_USERNAME: ${DB_USERNAME:-randomize}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      TELEGRAM_BOT_TOKEN: ${BOT_TOKEN}
+      TELEGRAM_MINI_APP_SHORT_NAME: ${TELEGRAM_MINI_APP_SHORT_NAME:-}
+      QUEUE_CONNECTION: database
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-secret}
+    volumes:
+      - ./api:/var/www
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - randomize
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  queue:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: randomize-queue
+    restart: unless-stopped
+    command: php artisan queue:work --tries=3 --timeout=3600 --sleep=2 --max-jobs=1000 --max-time=3600
+    environment:
+      APP_NAME: Randomize
+      APP_ENV: production
+      APP_KEY: ${APP_KEY:-}
+      APP_DEBUG: "false"
+      APP_URL: ${APP_URL:-http://localhost}
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-randomize}
+      DB_USERNAME: ${DB_USERNAME:-randomize}
+      DB_PASSWORD: ${DB_PASSWORD:-secret}
+      TELEGRAM_BOT_TOKEN: ${BOT_TOKEN}
+      TELEGRAM_MINI_APP_SHORT_NAME: ${TELEGRAM_MINI_APP_SHORT_NAME:-}
+      QUEUE_CONNECTION: database
+      ADMIN_LOGIN: ${ADMIN_LOGIN:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-secret}
+    volumes:
+      - ./api:/var/www
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - randomize
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  nginx:
+    image: nginx:alpine
+    container_name: randomize-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./api:/var/www
+      - ./webapp:/var/www/webapp
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+    depends_on:
+      - api
+    networks:
+      - randomize
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: randomize-bot
+    restart: unless-stopped
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      WEBAPP_URL: ${WEBAPP_URL:-https://yourdomain.com}
+      API_URL: http://nginx/api
+      ADMIN_IDS: ${ADMIN_IDS:-}
+    volumes:
+      - bot_data:/app/data
+    expose:
+      - "8080"
+    depends_on:
+      - nginx
+    networks:
+      - randomize
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  certbot:
+    image: certbot/certbot
+    container_name: randomize-certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    networks:
+      - randomize
+
+volumes:
+  mysql_data:
+  bot_data:
+
+networks:
+  randomize:
